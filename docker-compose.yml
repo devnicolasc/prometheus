@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.27.1
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=60d'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    networks: 
+      - prod
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prom_data:/prometheus
+
+  pushgateway:
+    image: prom/pushgateway:v1.4.0
+    container_name: pushgateway
+    ports:
+      - 9091:9091
+    restart: unless-stopped
+    networks: 
+      - prod
+
+networks:
+  prod:
+    external:
+      name: prod
+
+volumes: 
+  prom_data: {}
